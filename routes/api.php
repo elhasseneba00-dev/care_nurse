@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\V1\Admin\AdminNurseVerificationController;
 use App\Http\Controllers\V1\Care\CareRequestController;
+use App\Http\Controllers\V1\Chat\MessageController;
 use App\Http\Controllers\V1\Nurse\NurseProfileController;
 use App\Http\Controllers\V1\Nurse\NurseSearchController;
 use App\Http\Controllers\V1\Patient\PatientProfileController;
@@ -37,5 +39,14 @@ Route::prefix('v1')->group(function () {
 
         // NEW: ignore open request (nurse only)
         Route::post('/care-requests/{careRequest}/ignore', [CareRequestController::class, 'ignore']);
+
+        // Chat
+        Route::get('/care-requests/{careRequest}/messages', [MessageController::class, 'index']);
+        Route::post('/care-requests/{careRequest}/messages', [MessageController::class, 'store']);
+
+        Route::prefix('admin')->middleware('role:ADMIN')->group(function () {
+            Route::get('/nurses', [AdminNurseVerificationController::class, 'index']);
+            Route::post('/nurses/{nurseUserId}/verify', [AdminNurseVerificationController::class, 'verify']);
+        });
     });
 });

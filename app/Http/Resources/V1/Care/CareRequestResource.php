@@ -22,6 +22,7 @@ class CareRequestResource extends JsonResource
             'description' => $this->description,
             'scheduled_at' => $this->scheduled_at?->toISOString(),
             'address' => $this->address,
+            'city' => $this->city,
             'lat' => $this->lat,
             'lng' => $this->lng,
             'status' => $this->status,

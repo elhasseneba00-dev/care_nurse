@@ -83,8 +83,7 @@ SQL;
                 // Open same-city fallback (only if city exists)
                 $openCityClause = function ($q) use ($openBaseClause, $profile) {
                     $openBaseClause($q);
-                    $q->where('address', '!=', '') // minor sanity
-                    ->when(!empty($profile->city), fn ($q2) => $q2->where('address', 'ilike', '%'.$profile->city.'%'));
+                    $q->where('city', $profile->city);
                 };
 
                 // Combine: assigned OR (open nearby) OR (open city fallback)
@@ -120,7 +119,7 @@ SQL;
                         ->orWhere(function ($q2) use ($openBaseClause, $city) {
                             $openBaseClause($q2);
                             // If you have city column in care_requests later, replace with ->where('city', $city)
-                            $q2->where('address', 'ilike', '%'.$city.'%');
+                            $q2->where('city', $city);
                         });
                 });
             }
@@ -176,6 +175,7 @@ SQL;
             'description' => $payload['description'] ?? null,
             'scheduled_at' => $payload['scheduled_at'] ?? null,
             'address' => $payload['address'],
+            'city' => $payload['city'],
             'lat' => $payload['lat'],
             'lng' => $payload['lng'],
             'status' => 'PENDING',

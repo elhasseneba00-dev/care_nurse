@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->timestampTz('scheduled_at')->nullable();
             $table->text('address');
+            $table->text('city')->nullable();
             $table->double('lat')->nullable();
             $table->double('lng')->nullable();
             $table->string('status', 20)->default('PENDING');

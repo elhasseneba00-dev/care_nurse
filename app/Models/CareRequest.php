@@ -14,6 +14,7 @@ class CareRequest extends Model
         'description',
         'scheduled_at',
         'address',
+        'city',
         'lat',
         'lng',
         'status',

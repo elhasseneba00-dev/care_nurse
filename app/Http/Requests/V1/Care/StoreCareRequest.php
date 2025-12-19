@@ -28,11 +28,10 @@ class StoreCareRequest extends FormRequest
             // Open request: no nurse_user_id here
             'care_type' => ['required', 'string', 'max:80'],
             'description' => ['nullable', 'string', 'max:5000'],
-
             // ISO 8601 expected. ex: "2025-12-20T10:00:00+00:00"
             'scheduled_at' => ['nullable', 'date'],
-
             'address' => ['required', 'string', 'max:2000'],
+            'city' => ['required', 'string', 'max:80'],
             'lat' => ['nullable', 'numeric', 'between:-90,90'],
             'lng' => ['nullable', 'numeric', 'between:-180,180'],
         ];
