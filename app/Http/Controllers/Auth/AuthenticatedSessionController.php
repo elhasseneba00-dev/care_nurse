@@ -11,6 +11,36 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthenticatedSessionController extends Controller
 {
+    /**
+     * @OA\Post(
+     *   path="/login",
+     *   tags={"Auth"},
+     *   summary="Login with phone and password",
+     *   description="Returns a Sanctum token (Bearer).",
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"phone","password"},
+     *       @OA\Property(property="phone", type="string", example="22222222222"),
+     *       @OA\Property(property="password", type="string", example="password123")
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="OK",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="token_type", type="string", example="Bearer"),
+     *       @OA\Property(property="access_token", type="string", example="1|xxxxxxxxxxxxxxxx"),
+     *       @OA\Property(property="data", type="object",
+     *         @OA\Property(property="user", type="object")
+     *       ),
+     *       @OA\Property(property="message", type="string")
+     *     )
+     *   ),
+     *   @OA\Response(response=422, description="Invalid credentials / validation error"),
+     *   @OA\Response(response=403, description="Account not active")
+     * )
+     */
     public function store(Request $request): JsonResponse
     {
         $credentials = $request->validate([
@@ -52,7 +82,15 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
-    public function destroy(Request $request): JsonResponse
+    /**
+     * @OA\Post(
+     *   path="/logout",
+     *   tags={"Auth"},
+     *   summary="Logout (revoke current token)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=204, description="Logged out")
+     * )
+     */    public function destroy(Request $request): JsonResponse
     {
         $user = $request->user();
 

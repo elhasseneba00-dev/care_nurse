@@ -5,7 +5,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'L5 Swagger UI',
+                'title' => env('APP_NAME', 'API') . ' - Documentation',
             ],
 
             'routes' => [
@@ -13,6 +13,21 @@ return [
                  * Route for accessing api documentation interface
                  */
                 'api' => 'api/documentation',
+                'docs' => 'docs',
+                'oauth2_callback' => 'api/oauth2-callback',
+                'middleware' => [
+                    'api' => [
+                        // Only allow docs in local environment
+                        \App\Http\Middleware\DevOnly::class,
+                    ],
+                    'asset' => [],
+                    'docs' => [
+                        \App\Http\Middleware\DevOnly::class,
+                    ],
+                    'oauth2_callback' => [
+                        \App\Http\Middleware\DevOnly::class,
+                    ],
+                ],
             ],
             'paths' => [
                 /*

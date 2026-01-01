@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\MeController;
 use App\Http\Controllers\V1\Admin\AdminCareRequestController;
 use App\Http\Controllers\V1\Admin\AdminCareRequestMessageController;
 use App\Http\Controllers\V1\Admin\AdminNurseVerificationController;
@@ -25,9 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/nurses/{nurseUserId}/rating', [ReviewController::class, 'ratingByNurse']);
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/me', function (Request $request) {
-            return response()->json(['data' => $request->user()]);
-        });
+        Route::get('/me', [MeController::class, 'me']);
 
         Route::get('/patient/profile', [PatientProfileController::class, 'show']);
         Route::put('/patient/profile', [PatientProfileController::class, 'upsert']);

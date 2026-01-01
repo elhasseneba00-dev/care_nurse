@@ -12,6 +12,16 @@ use Illuminate\Support\Facades\DB;
 
 class FavoriteController extends Controller
 {
+    /**
+     * @OA\Get(
+     *   path="/favorites",
+     *   tags={"Favorites"},
+     *   summary="List favorite nurses",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="OK"),
+     *   @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function index(Request $request): JsonResponse
     {
         /** @var User $user */
@@ -89,6 +99,18 @@ class FavoriteController extends Controller
         return response()->json(['data' => $data]);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/favorites/{nurseUserId}",
+     *   tags={"Favorites"},
+     *   summary="Add a nurse to favorites",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="nurseUserId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=204, description="No content"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=422, description="Invalid nurse")
+     * )
+     */
     public function store(Request $request, int $nurseUserId): JsonResponse
     {
         /** @var User $user */
@@ -121,6 +143,17 @@ class FavoriteController extends Controller
         return response()->json([], 204);
     }
 
+    /**
+     * @OA\Delete(
+     *   path="/favorites/{nurseUserId}",
+     *   tags={"Favorites"},
+     *   summary="Remove a nurse from favorites",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="nurseUserId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=204, description="No content"),
+     *   @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function destroy(Request $request, int $nurseUserId): JsonResponse
     {
         /** @var User $user */

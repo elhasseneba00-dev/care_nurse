@@ -18,6 +18,17 @@ use Illuminate\Http\Request;
 
 class CareRequestController extends Controller
 {
+    /**
+     * @OA\Get(
+     *   path="/care-requests",
+     *   tags={"Care Requests"},
+     *   summary="List care requests for current user",
+     *   description="PATIENT: returns own requests. NURSE: returns assigned + nearby open BROADCAST + open TARGETED (to self). ADMIN: all.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="OK"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
     public function index(Request $request): JsonResponse
     {
         /** @var User $user */
@@ -190,6 +201,23 @@ SQL;
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *   path="/care-requests/{careRequest}",
+     *   tags={"Care Requests"},
+     *   summary="Get a care request",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(
+     *     name="careRequest",
+     *     in="path",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     *   ),
+     *   @OA\Response(response=200, description="OK"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=404, description="Not found")
+     * )
+     */
     public function show(Request $request, CareRequest $careRequest): JsonResponse
     {
         /** @var User $user */
@@ -216,6 +244,34 @@ SQL;
         return response()->json(['data' => new CareRequestResource($careRequest)]);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/care-requests",
+     *   tags={"Care Requests"},
+     *   summary="Create a new care request",
+     *   description="PATIENT only. Supports BROADCAST (default) or TARGETED (to a specific verified nurse).",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"care_type","address","city","lat","lng"},
+     *       @OA\Property(property="care_type", type="string", example="Injection"),
+     *       @OA\Property(property="description", type="string", nullable=true, example="Besoin d'une injection IM"),
+     *       @OA\Property(property="scheduled_at", type="string", format="date-time", nullable=true, example="2026-01-02T10:00:00Z"),
+     *       @OA\Property(property="address", type="string", example="Tevragh Zeina"),
+     *       @OA\Property(property="city", type="string", example="Nouakchott"),
+     *       @OA\Property(property="lat", type="number", format="float", example=18.102),
+     *       @OA\Property(property="lng", type="number", format="float", example=-15.958),
+     *       @OA\Property(property="visibility", type="string", enum={"BROADCAST","TARGETED"}, example="BROADCAST"),
+     *       @OA\Property(property="target_nurse_user_id", type="integer", nullable=true, example=123),
+     *       @OA\Property(property="expires_at", type="string", format="date-time", nullable=true, example="2026-01-02T10:10:00Z")
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Created"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=422, description="Validation error")
+     * )
+     */
     public function store(StoreCareRequest $request): JsonResponse
     {
         /** @var User $user */
@@ -285,6 +341,19 @@ SQL;
         return response()->json(['data' => new CareRequestResource($careRequest)], 201);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/care-requests/{careRequest}/accept",
+     *   tags={"Care Requests"},
+     *   summary="Accept an open care request",
+     *   description="NURSE only. For TARGETED, only the targeted nurse can accept.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="careRequest", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=409, description="No longer available")
+     * )
+     */
     public function accept(ActionCareRequest $request, CareRequest $careRequest): JsonResponse
     {
         /** @var User $user */
@@ -337,6 +406,19 @@ SQL;
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/care-requests/{careRequest}/ignore",
+     *   tags={"Care Requests"},
+     *   summary="Ignore an open care request",
+     *   description="NURSE only. Only for open BROADCAST requests.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="careRequest", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=204, description="No content"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=422, description="Invalid request state")
+     * )
+     */
     public function ignore(ActionCareRequest $request, CareRequest $careRequest): JsonResponse
     {
         /** @var User $user */
@@ -361,6 +443,19 @@ SQL;
         return response()->json([], 204);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/care-requests/{careRequest}/cancel",
+     *   tags={"Care Requests"},
+     *   summary="Cancel a care request",
+     *   description="PATIENT only. Allowed statuses: PENDING or ACCEPTED.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="careRequest", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=422, description="Invalid status")
+     * )
+     */
     public function cancel(ActionCareRequest $request, CareRequest $careRequest): JsonResponse
     {
         /** @var User $user */
@@ -407,6 +502,19 @@ SQL;
         return response()->json(['data' => new CareRequestResource($careRequest->fresh())]);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/care-requests/{careRequest}/complete",
+     *   tags={"Care Requests"},
+     *   summary="Complete a care request",
+     *   description="NURSE only. Allowed status: ACCEPTED. Marks it as DONE.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="careRequest", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=422, description="Invalid status")
+     * )
+     */
     public function complete(ActionCareRequest $request, CareRequest $careRequest): JsonResponse
     {
         /** @var User $user */
@@ -450,6 +558,27 @@ SQL;
     }
 
 
+    /**
+     * @OA\Post(
+     *   path="/care-requests/{careRequest}/rebook",
+     *   tags={"Care Requests"},
+     *   summary="Rebook based on a previous care request",
+     *   description="PATIENT only. Only allowed when original request is DONE. Can rebook as TARGETED (same nurse) or BROADCAST.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="careRequest", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=false,
+     *     @OA\JsonContent(
+     *       @OA\Property(property="same_nurse", type="boolean", example=true),
+     *       @OA\Property(property="scheduled_at", type="string", format="date-time", nullable=true, example="2026-01-02T10:00:00Z"),
+     *       @OA\Property(property="expires_at", type="string", format="date-time", nullable=true, example="2026-01-02T10:10:00Z")
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Created"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=422, description="Invalid status")
+     * )
+     */
     public function rebook(RebookCareRequest $request, CareRequest $careRequest): JsonResponse
     {
         /** @var User $user */

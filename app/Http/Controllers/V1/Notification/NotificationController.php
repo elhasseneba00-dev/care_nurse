@@ -8,6 +8,17 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
+    /**
+     * @OA\Get(
+     *   path="/notifications",
+     *   tags={"Notifications"},
+     *   summary="List notifications",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="unread", in="query", required=false, @OA\Schema(type="boolean")),
+     *   @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", default=20)),
+     *   @OA\Response(response=200, description="OK")
+     * )
+     */
     public function index(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -39,6 +50,17 @@ class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/notifications/{id}/read",
+     *   tags={"Notifications"},
+     *   summary="Mark one notification as read",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string")),
+     *   @OA\Response(response=204, description="No content"),
+     *   @OA\Response(response=404, description="Not found")
+     * )
+     */
     public function markRead(Request $request, string $id): JsonResponse
     {
         $notification = $request->user()->notifications()->where('id', $id)->firstOrFail();
@@ -47,6 +69,15 @@ class NotificationController extends Controller
         return response()->json([], 204);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/notifications/read-all",
+     *   tags={"Notifications"},
+     *   summary="Mark all notifications as read",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=204, description="No content")
+     * )
+     */
     public function markAllRead(Request $request): JsonResponse
     {
         $request->user()->unreadNotifications->markAsRead();

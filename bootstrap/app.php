@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RequireRole::class,
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'devonly' => \App\Http\Middleware\DevOnly::class,
         ]);
 
         //
