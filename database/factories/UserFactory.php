@@ -27,7 +27,6 @@ class UserFactory extends Factory
             'full_name' => fake()->name(),
             'phone' => fake()->unique()->numerify('222########'),
             'email' => fake()->unique()->safeEmail(),
-            'phone_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'role' => 'PATIENT',
             'status' => 'ACTIVE',
