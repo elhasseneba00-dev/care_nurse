@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             AdminUserSeeder::class,
+            NurseUserSeeder::class,
+            PatientUserSeeder::class,
+            CareRequestSeeder::class, // Optional: sample care requests
         ]);
     }
 }

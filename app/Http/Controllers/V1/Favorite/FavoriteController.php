@@ -140,7 +140,9 @@ class FavoriteController extends Controller
             ]
         );
 
-        return response()->json([], 204);
+        return response()->json([
+            'message' => 'Nurse added to favorites successfully.',
+        ], 200);
     }
 
     /**
@@ -168,6 +170,8 @@ class FavoriteController extends Controller
             ->where('nurse_user_id', $nurseUserId)
             ->delete();
 
-        return response()->json([], 204);
+        return response()->json([
+            'message' => 'Nurse removed from favorites successfully.',
+        ], 200);
     }
 }

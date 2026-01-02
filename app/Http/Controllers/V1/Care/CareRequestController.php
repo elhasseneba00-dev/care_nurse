@@ -448,9 +448,9 @@ SQL;
             'created_at' => now(),
         ]);
 
-        Audit::log($user, 'CARE_REQUEST_ACCEPTED', 'CareRequest', $careRequest->id, [], $request);
-
-        return response()->json([], 204);
+        return response()->json([
+            'message' => 'Request ignored successfully.',
+        ], 200);
     }
 
     /**

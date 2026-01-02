@@ -86,12 +86,12 @@ class AuthenticatedSessionController extends Controller
         ], $request);
 
         return response()->json([
-            'token_type' => 'Bearer',
-            'access_token' => $token,
             'data' => [
+                'token_type' => 'Bearer',
+                'access_token' => $token,
                 'user' => $user,
             ],
-            "message" => "As a $user->role, u've successfully connected.",
+            'message' => "As a $user->role, you've successfully connected.",
         ]);
     }
 
@@ -114,7 +114,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         return response()->json([
-            "message" => "User have successfully disconnected.",
-        ], 204);
+            'message' => 'User has successfully disconnected.',
+        ], 200);
     }
 }

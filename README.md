@@ -42,6 +42,68 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 - **[Redberry](https://redberry.international/laravel-development)**
 - **[Active Logic](https://activelogic.com)**
 
+## Care Nurse API
+
+### Development Setup
+
+#### Database Seeding
+
+For local development and testing, the application includes seeders to populate the database with sample data:
+
+```bash
+php artisan db:seed
+```
+
+This will create:
+- **Admin User**: Phone `22211111111`, Password `admin123`
+- **Nurses** (4 users): Phone numbers starting with `222333...`, `222444...`, `222555...`, `222666...`, Password `nurse123`
+  - 3 verified nurses with complete profiles (location, coverage area, price ranges)
+  - 1 unverified nurse
+- **Patients** (3 users): Phone numbers starting with `222777...`, `222888...`, `222999...`, Password `patient123`
+  - Each with complete profile and medical notes
+- **Sample Care Requests**: Various statuses (PENDING, ACCEPTED, DONE) to test the UI
+
+**⚠️ Important**: These seeders are intended for local/development environments only. Do not run them in production.
+
+To run individual seeders:
+```bash
+php artisan db:seed --class=AdminUserSeeder
+php artisan db:seed --class=NurseUserSeeder
+php artisan db:seed --class=PatientUserSeeder
+php artisan db:seed --class=CareRequestSeeder
+```
+
+### API Features
+
+#### Rate Limiting
+
+The following endpoints have rate limiting to prevent abuse:
+
+- **Login** (`POST /api/v1/login`): 5 requests per minute
+- **Care Request Creation** (`POST /api/v1/care-requests`): 10 requests per 60 minutes (1 hour) per patient
+- **Chat Messages** (`POST /api/v1/care-requests/{id}/messages`): 20 requests per minute per user
+
+#### Response Format
+
+All API endpoints follow a consistent JSON response format:
+
+**Success responses:**
+```json
+{
+  "data": { ... },
+  "meta": { ... },      // optional, for pagination
+  "message": "..."      // optional
+}
+```
+
+**Error responses:**
+```json
+{
+  "message": "Error description",
+  "errors": { ... }     // for validation errors
+}
+```
+
 ## Contributing
 
 Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
